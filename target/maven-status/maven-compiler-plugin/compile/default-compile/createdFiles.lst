@@ -1,4 +1,4 @@
 com\lasgemelas\repository\ProductoRepository.class
+com\lasgemelas\controller\AuthController.class
 com\lasgemelas\repository\UsuarioRepository.class
 com\lasgemelas\repository\TecnicoRepository.class
-com\lasgemelas\controller\AuthController.class

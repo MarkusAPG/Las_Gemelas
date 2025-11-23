@@ -117,7 +117,11 @@ VALUES
 INSERT INTO usuarios (nombre, apellido, correo, correo_recuperacion, contrasena, telefono, direccion, rol)
 VALUES
 ('María', 'Pérez', 'maria@gmail.com', 'maria_recup@gmail.com', '12345', '987654321', 'Av. Los Olivos 123', 'cliente'),
-('Juan', 'Ramírez', 'juan@gmail.com', 'juan_backup@gmail.com', '12345', '986543210', 'Calle Las Flores 456', 'cliente');
+('Juan', 'Ramírez', 'juan@gmail.com', 'juan_backup@gmail.com', '12345', '986543210', 'Calle Las Flores 456', 'cliente'),
+('Tecnico', 'Uno', 'tecnico1@tienda.com', NULL, '12345', '999000111', 'Oficina Central', 'tecnico'),
+('Tecnico', 'Dos', 'tecnico2@tienda.com', NULL, '12345', '999000222', 'Almacén', 'tecnico'),
+('Usuario', 'Prueba1', 'usuario1@tienda.com', NULL, '12345', '999111222', 'Casa 1', 'cliente'),
+('Usuario', 'Prueba2', 'usuario2@tienda.com', NULL, '12345', '999333444', 'Casa 2', 'cliente');
 
 -- ==============================
 -- INSERTAR TÉCNICOS

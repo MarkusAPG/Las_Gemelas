@@ -3,86 +3,97 @@
 
 <head>
     <title>Tienda - Las Gemelas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
     <header>
-        <h1>✨ Las Gemelas ✨</h1>
+        <h1>Las Gemelas</h1>
         <nav>
-            <span th:if="${session.usuario}" style="margin-right: 1rem; padding: 0.5rem 1rem; border-radius: 8px; background: rgba(255, 255, 255, 0.1);">
-                👋 Hola, <span th:text="${session.usuario.nombre}"></span>
-            </span>
-            <a th:if="${session.usuario == null}" th:href="@{/login}">🔐 Login</a>
-            <a th:if="${session.usuario}" th:href="@{/logout}">🚪 Salir</a>
+            <a th:href="@{/}">Inicio</a>
+
+            <!-- Guest Nav -->
+            <th:block th:if="${session.usuario == null}">
+                <a th:href="@{/login}">Iniciar Sesión</a>
+                <a th:href="@{/register}">Registrarse</a>
+            </th:block>
+
+            <!-- Logged In Nav -->
+            <th:block th:if="${session.usuario != null}">
+                <a th:href="@{/cart}" style="position: relative;">
+                    🛒 <span class="cart-count" th:text="${session.cart != null ? session.cart.size() : 0}">0</span>
+                </a>
+
+                <div class="dropdown">
+                    <a href="#" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span th:text="${session.usuario.nombre}">Usuario</span>
+                        <span style="font-size: 0.8rem;">▼</span>
+                    </a>
+                    <div class="dropdown-content">
+                        <a th:if="${session.usuario.rol == 'admin'}" th:href="@{/admin}">Panel Admin</a>
+                        <a th:if="${session.usuario.rol == 'tecnico'}" th:href="@{/tecnico}">Panel Técnico</a>
+                        <a th:href="@{/logout}">Cerrar Sesión</a>
+                    </div>
+                </div>
+            </th:block>
         </nav>
     </header>
 
     <div class="container">
-        <h2>🎭 Nuestros Disfraces</h2>
+        <h2>Nuestros Disfraces</h2>
 
         <div class="product-grid">
-            <div class="card" th:each="producto, iterStat : ${productos}">
-                <div style="position: relative; overflow: hidden;">
-                    <img th:src="@{'/img/' + ${producto.imagen}}" alt="Imagen Producto"
-                        onerror="this.src='https://via.placeholder.com/250'"
-                        style="transition: transform 0.5s ease;">
-                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(107, 70, 193, 0.9); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; backdrop-filter: blur(10px);"
-                        th:text="${producto.categoria}"></div>
+            <div class="card" th:each="producto : ${productos}">
+                <!-- Improved image handling to prevent flickering -->
+                <div style="overflow: hidden; position: relative;">
+                    <img th:src="@{'/img/' + ${producto.imagen}}" alt="Disfraz"
+                        onerror="this.onerror=null; this.src='https://placehold.co/400x300/7c3aed/ffffff?text=Sin+Imagen';">
                 </div>
-                <div class="card-body">
-                    <h3 class="card-title" th:text="${producto.nombre}">Nombre</h3>
-                    <p style="color: #666; font-size: 0.9rem; line-height: 1.6;" th:text="${producto.descripcion}">Descripción</p>
-                    <p style="margin: 0.5rem 0;"><strong style="color: var(--secondary-color);">Categoría:</strong> 
-                        <span style="color: var(--primary-color); font-weight: 600;" th:text="${producto.categoria}"></span>
-                    </p>
 
-                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px solid var(--light-purple);">
-                        <div th:if="${producto.tipo == 'venta' or producto.tipo == 'ambos'}" style="margin-bottom: 0.75rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 600; color: var(--primary-color);">
-                                    💰 Venta: <span style="font-size: 1.2rem; color: var(--secondary-color);" th:text="'S/ ' + ${producto.precioVenta}">0.00</span>
-                                </span>
-                                <button class="btn btn-primary" style="font-size: 0.85rem; padding: 0.6rem 1.2rem;" 
-                                        onmouseover="this.style.transform='scale(1.05)'" 
-                                        onmouseout="this.style.transform='scale(1)'">🛒 Comprar</button>
-                            </div>
+                <div class="card-body">
+                    <span class="badge" th:text="${producto.categoria}">Categoría</span>
+                    <h3 class="card-title" th:text="${producto.nombre}">Nombre del Producto</h3>
+                    <p class="card-text" th:text="${producto.descripcion}">Descripción del producto...</p>
+
+                    <div class="price-container">
+                        <div th:if="${producto.tipo == 'venta' or producto.tipo == 'ambos'}">
+                            <span class="price-label">Precio Venta</span>
+                            <span class="price">S/ <span th:text="${producto.precioVenta}">0.00</span></span>
                         </div>
-                        <div th:if="${producto.tipo == 'alquiler' or producto.tipo == 'ambos'}" style="margin-top: 0.75rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 600; color: var(--primary-color);">
-                                    📅 Alquiler: <span style="font-size: 1.2rem; color: var(--secondary-color);" th:text="'S/ ' + ${producto.precioAlquiler}">0.00</span>
-                                </span>
-                                <button class="btn btn-primary" 
-                                        style="font-size: 0.85rem; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, var(--secondary-color) 0%, var(--dark-purple) 100%);"
-                                        onmouseover="this.style.transform='scale(1.05)'" 
-                                        onmouseout="this.style.transform='scale(1)'">📋 Alquilar</button>
-                            </div>
+
+                        <form th:action="@{/cart/add}" method="post" style="margin: 0;">
+                            <input type="hidden" name="productId" th:value="${producto.id}">
+                            <input type="hidden" name="type" value="venta">
+                            <button type="submit" class="btn btn-primary">
+                                <span>Agregar</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="price-container" th:if="${producto.tipo == 'alquiler' or producto.tipo == 'ambos'}"
+                        style="margin-top: 0.5rem; border-top: none; padding-top: 0;">
+                        <div>
+                            <span class="price-label">Precio Alquiler</span>
+                            <span class="price" style="color: var(--secondary-color);">S/ <span
+                                    th:text="${producto.precioAlquiler}">0.00</span></span>
                         </div>
+
+                        <form th:action="@{/cart/add}" method="post" style="margin: 0;">
+                            <input type="hidden" name="productId" th:value="${producto.id}">
+                            <input type="hidden" name="type" value="alquiler">
+                            <button type="submit" class="btn btn-outline">
+                                <span>Alquilar</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        // Add smooth scroll behavior
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add stagger animation to cards
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
-
-            // Add interactive hover effects
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-                });
-            });
-        });
-    </script>
 </body>
 
 </html>

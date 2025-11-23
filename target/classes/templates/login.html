@@ -1,69 +1,47 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Login - Las Gemelas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
     <header>
-        <h1>✨ Las Gemelas ✨</h1>
+        <h1>Las Gemelas</h1>
         <nav>
-            <a th:href="@{/}">🏠 Inicio</a>
-            <a th:href="@{/register}">📝 Registrarse</a>
+            <a th:href="@{/}">Inicio</a>
+            <a th:href="@{/register}">Registrarse</a>
         </nav>
     </header>
 
     <div class="container">
         <div class="form-container">
-            <h2 style="text-align: center;">🔐 Iniciar Sesión</h2>
-            <div th:if="${param.registered}" class="alert alert-success">
-                ✅ ¡Registro exitoso! Por favor inicia sesión.
+            <h2 style="text-align: center; color: var(--primary-color);">Iniciar Sesión</h2>
+            <div th:if="${param.registered}"
+                style="color: var(--success-color); text-align: center; margin-bottom: 1rem; padding: 0.5rem; background-color: var(--success-bg); border-radius: 4px;">
+                ¡Registro exitoso! Por favor inicia sesión.
             </div>
-            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-            <form th:action="@{/login}" method="post" id="loginForm">
+            <div th:if="${error}"
+                style="color: var(--error-color); text-align: center; margin-bottom: 1rem; padding: 0.5rem; background-color: var(--error-bg); border-radius: 4px;"
+                th:text="${error}"></div>
+            <form th:action="@{/login}" method="post">
                 <div class="form-group">
-                    <label for="correo">📧 Correo Electrónico</label>
-                    <input type="email" id="correo" name="correo" class="form-control" 
-                           placeholder="tu@email.com" required autocomplete="email">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="contrasena">🔒 Contraseña</label>
-                    <input type="password" id="contrasena" name="contrasena" class="form-control" 
-                           placeholder="••••••••" required autocomplete="current-password">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" class="form-control" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
-                    🚀 Ingresar
-                </button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Ingresar</button>
             </form>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginForm');
-            const inputs = form.querySelectorAll('input');
-            
-            // Add focus animations
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.style.transform = 'scale(1.02)';
-                    this.parentElement.style.transition = 'transform 0.3s ease';
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.parentElement.style.transform = 'scale(1)';
-                });
-            });
-
-            // Form submission animation
-            form.addEventListener('submit', function(e) {
-                const button = form.querySelector('button[type="submit"]');
-                button.innerHTML = '⏳ Ingresando...';
-                button.style.opacity = '0.7';
-                button.disabled = true;
-            });
-        });
-    </script>
 </body>
+
 </html>

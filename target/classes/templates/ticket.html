@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Ticket de Compra - Las Gemelas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- html2pdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .ticket-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 2rem auto;
+            color: #333;
+        }
+
+        .ticket-header {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .ticket-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .ticket-table th,
+        .ticket-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .ticket-total {
+            text-align: right;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #ticket-content,
+            #ticket-content * {
+                visibility: visible;
+            }
+
+            #ticket-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="no-print">
+        <h1>Las Gemelas</h1>
+        <nav>
+            <a th:href="@{/}">Volver a Tienda</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div id="ticket-content" class="ticket-box">
+            <div class="ticket-header">
+                <h2 style="color: var(--primary-color); margin: 0;">Las Gemelas</h2>
+                <p>Tienda de Disfraces y Accesorios</p>
+                <p>Ticket #<span th:text="${ticket.id}">001</span></p>
+            </div>
+
+            <div class="ticket-info">
+                <div>
+                    <strong>Cliente:</strong><br>
+                    <span th:text="${ticket.usuario.nombre + ' ' + ticket.usuario.apellido}">Nombre</span><br>
+                    <span th:text="${ticket.usuario.correo}">correo@email.com</span>
+                </div>
+                <div style="text-align: right;">
+                    <strong>Fecha:</strong><br>
+                    <span th:text="${#temporals.format(ticket.fecha, 'dd-MM-yyyy HH:mm')}">01-01-2023</span>
+                </div>
+            </div>
+
+            <table class="ticket-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Tipo</th>
+                        <th>Cant.</th>
+                        <th>Precio Unit.</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="detalle : ${ticket.detalles}">
+                        <td th:text="${detalle.producto.nombre}">Producto</td>
+                        <td th:text="${detalle.tipo}">Venta</td>
+                        <td th:text="${detalle.cantidad}">1</td>
+                        <td th:text="${'S/ ' + detalle.precioUnitario}">S/ 10.00</td>
+                        <td th:text="${'S/ ' + detalle.subtotal}">S/ 10.00</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="ticket-total">
+                Total: S/ <span th:text="${ticket.total}">100.00</span>
+            </div>
+
+            <div style="margin-top: 2rem; text-align: center; font-size: 0.9rem; color: #666;">
+                <p>¡Gracias por su preferencia!</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 1rem;" class="no-print">
+            <button onclick="downloadPDF()" class="btn btn-primary">Descargar PDF</button>
+            <a th:href="@{/}" class="btn btn-outline" style="margin-left: 1rem;">Volver al Inicio</a>
+        </div>
+    </div>
+
+    <script>
+        function downloadPDF() {
+            const element = document.getElementById('ticket-content');
+            const opt = {
+                margin: 0.5,
+                filename: 'ticket_las_gemelas.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+
+</html>

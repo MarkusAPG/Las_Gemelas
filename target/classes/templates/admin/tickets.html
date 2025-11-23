@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Admin - Tickets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <nav>
+            <!-- Management Dropdown -->
+            <div class="dropdown">
+                <a href="#" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>Gestión</span>
+                    <span style="font-size: 0.8rem;">▼</span>
+                </a>
+                <div class="dropdown-content">
+                    <a th:href="@{/admin/products}">Productos</a>
+                    <a th:href="@{/admin/users}">Usuarios</a>
+                    <a th:href="@{/admin/tickets}">Tickets</a>
+                </div>
+            </div>
+
+            <a th:href="@{/}"
+                style="margin-left: 2rem; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 1rem;">Volver a
+                Tienda</a>
+
+            <!-- User Profile Dropdown -->
+            <div class="dropdown">
+                <a href="#" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span th:text="${session.usuario.nombre}">Admin</span>
+                    <span style="font-size: 0.8rem;">▼</span>
+                </a>
+                <div class="dropdown-content">
+                    <a th:href="@{/logout}">Cerrar Sesión</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Historial de Tickets</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ticket : ${tickets}">
+                        <td th:text="${ticket.id}">1</td>
+                        <td th:text="${#temporals.format(ticket.fecha, 'dd-MM-yyyy HH:mm')}">01-01-2023</td>
+                        <td th:text="${ticket.usuario.nombre + ' ' + ticket.usuario.apellido}">Cliente</td>
+                        <td th:text="${'S/ ' + ticket.total}">S/ 100.00</td>
+                        <td>
+                            <a th:href="@{'/admin/tickets/' + ${ticket.id}}" class="btn btn-primary"
+                                style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">
+                                Ver Detalle
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

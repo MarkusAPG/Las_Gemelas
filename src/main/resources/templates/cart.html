@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Carrito - Las Gemelas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <header>
+        <h1>Las Gemelas</h1>
+        <nav>
+            <a th:href="@{/}">Inicio</a>
+            <a th:href="@{/cart}" class="active">
+                Carrito <span class="cart-count" th:if="${session.cartSize > 0}" th:text="${session.cartSize}">0</span>
+            </a>
+            <span th:if="${session.usuario}"
+                style="margin-left: 1rem; border-left: 1px solid #ddd; padding-left: 1rem;">
+                Hola, <span th:text="${session.usuario.nombre}"></span>
+            </span>
+            <a th:if="${session.usuario == null}" th:href="@{/login}">Ingresar</a>
+            <a th:if="${session.usuario}" th:href="@{/logout}">Salir</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Tu Carrito de Compras</h2>
+
+        <div th:if="${cart == null or cart.empty}" class="text-center" style="padding: 4rem 0;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🛒</div>
+            <p style="font-size: 1.2rem; color: var(--text-light);">Tu carrito está vacío.</p>
+            <a th:href="@{/}" class="btn btn-primary mt-4">Explorar Disfraces</a>
+        </div>
+
+        <div th:if="${cart != null and !cart.empty}">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Tipo</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item, stat : ${cart}">
+                            <td>
+                                <div class="d-flex align-center gap-2">
+                                    <img th:src="@{'/img/' + ${item.producto.imagen}}" alt="Img"
+                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;"
+                                        onerror="this.onerror=null; this.src='https://placehold.co/50x50/7c3aed/ffffff?text=Img';">
+                                    <span th:text="${item.producto.nombre}" style="font-weight: 600;">Nombre</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" th:text="${item.tipo}"
+                                    th:style="${item.tipo == 'alquiler' ? 'background: rgba(219, 39, 119, 0.1); color: var(--secondary-color);' : ''}">
+                                    Tipo
+                                </span>
+                            </td>
+                            <td>
+                                S/ <span
+                                    th:text="${item.tipo == 'alquiler' ? item.producto.precioAlquiler : item.producto.precioVenta}">0.00</span>
+                            </td>
+                            <td th:text="${item.cantidad}">1</td>
+                            <td style="font-weight: 700; color: var(--primary-color);">
+                                S/ <span th:text="${item.subtotal}">0.00</span>
+                            </td>
+                            <td>
+                                <a th:href="@{'/cart/remove/' + ${stat.index}}"
+                                    style="color: #ef4444; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                                    Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+</html>

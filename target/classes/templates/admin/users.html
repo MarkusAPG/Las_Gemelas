@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Admin - Usuarios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <nav>
+            <!-- User Profile Dropdown -->
+            <div class="dropdown">
+                <a href="#" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span th:text="${session.usuario.nombre}">Admin</span>
+                    <span style="font-size: 0.8rem;">▼</span>
+                </a>
+                <div class="dropdown-content">
+                    <a th:href="@{/logout}">Cerrar Sesión</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Gestión de Usuarios</h2>
+
+        <!-- Add User Form -->
+        <div class="form-container" style="max-width: 100%; margin-bottom: 3rem;">
+            <h3 style="margin-top: 0; color: var(--primary-color);">Agregar Nuevo Usuario</h3>
+            <form th:action="@{/admin/users/add}" th:object="${usuario}" method="post"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Apellido</label>
+                    <input type="text" th:field="*{apellido}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo</label>
+                    <input type="email" th:field="*{correo}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" th:field="*{contrasena}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select th:field="*{rol}" class="form-control">
+                        <option value="cliente">Cliente</option>
+                        <option value="admin">Administrador</option>
+                        <option value="tecnico">Técnico</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="text" th:field="*{telefono}" class="form-control">
+                </div>
+                <div style="grid-column: span 2;">
+                    <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- User List -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Teléfono</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${usuarios}">
+                        <td th:text="${user.id}">1</td>
+                        <td th:text="${user.nombre + ' ' + user.apellido}">Nombre Completo</td>
+                        <td th:text="${user.correo}">correo@ejemplo.com</td>
+                        <td>
+                            <span class="badge" th:text="${user.rol}"
+                                th:style="${user.rol == 'admin' ? 'background: rgba(124, 58, 237, 0.1); color: var(--primary-color);' : (user.rol == 'tecnico' ? 'background: rgba(219, 39, 119, 0.1); color: var(--secondary-color);' : '')}">
+                                Rol
+                            </span>
+                        </td>
+                        <td th:text="${user.telefono}">123456789</td>
+                        <td>
+                            <a th:href="@{'/admin/users/delete/' + ${user.id}}"
+                                onclick="return confirm('¿Estás seguro de eliminar este usuario?')"
+                                style="color: #ef4444; font-weight: 600; text-decoration: none;">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

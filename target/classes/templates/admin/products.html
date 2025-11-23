@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Admin - Productos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <nav>
+            <!-- User Profile Dropdown -->
+            <div class="dropdown">
+                <a href="#" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span th:text="${session.usuario.nombre}">Admin</span>
+                    <span style="font-size: 0.8rem;">▼</span>
+                </a>
+                <div class="dropdown-content">
+                    <a th:href="@{/logout}">Cerrar Sesión</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Gestión de Productos</h2>
+
+        <!-- Add Product Form -->
+        <div class="form-container" style="max-width: 100%; margin-bottom: 3rem;">
+            <h3 style="margin-top: 0; color: var(--primary-color);">Agregar Nuevo Producto</h3>
+            <form th:action="@{/admin/products/add}" th:object="${producto}" method="post" enctype="multipart/form-data"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <input type="text" th:field="*{categoria}" class="form-control">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Descripción</label>
+                    <textarea th:field="*{descripcion}" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select th:field="*{tipo}" class="form-control">
+                        <option value="ambos">Ambos</option>
+                        <option value="venta">Venta</option>
+                        <option value="alquiler">Alquiler</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Stock Inicial</label>
+                    <input type="number" th:field="*{stock}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Precio Venta</label>
+                    <input type="number" step="0.01" th:field="*{precioVenta}" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Precio Alquiler</label>
+                    <input type="number" step="0.01" th:field="*{precioAlquiler}" class="form-control">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Imagen</label>
+                    <input type="file" name="imageFile" class="form-control" accept="image/*">
+                </div>
+                <div style="grid-column: span 2;">
+                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Product List -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Stock</th>
+                        <th>Tipo</th>
+                        <th>Venta</th>
+                        <th>Alquiler</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="prod : ${productos}">
+                        <td th:text="${prod.id}">1</td>
+                        <td>
+                            <img th:src="@{'/img/' + ${prod.imagen}}"
+                                style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"
+                                onerror="this.onerror=null; this.src='https://placehold.co/40x40/7c3aed/ffffff?text=Img';">
+                        </td>
+                        <td th:text="${prod.nombre}">Nombre</td>
+                        <td>
+                            <form th:action="@{/admin/products/updateStock}" method="post"
+                                style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="hidden" name="id" th:value="${prod.id}">
+                                <input type="number" name="stock" th:value="${prod.stock}"
+                                    style="width: 60px; padding: 0.2rem;" class="form-control">
+                                <button type="submit" class="btn btn-primary"
+                                    style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">↻</button>
+                            </form>
+                        </td>
+                        <td th:text="${prod.tipo}">ambos</td>
+                        <td th:text="${prod.precioVenta}">0.00</td>
+                        <td th:text="${prod.precioAlquiler}">0.00</td>
+                        <td>
+                            <a th:href="@{'/admin/products/delete/' + ${prod.id}}"
+                                onclick="return confirm('¿Estás seguro de eliminar este producto?')"
+                                style="color: #ef4444; font-weight: 600; text-decoration: none;">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

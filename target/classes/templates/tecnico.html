@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Panel Técnico - Las Gemelas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <header>
+        <h1>Panel Técnico</h1>
+        <nav>
+            <a th:href="@{/tecnico}" class="active">Dashboard</a>
+            <a th:href="@{/}"
+                style="margin-left: 2rem; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 1rem;">Volver a
+                Tienda</a>
+            <a th:href="@{/logout}">Salir</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Bienvenido, <span th:text="${session.usuario.nombre}">Técnico</span></h2>
+
+        <div style="display: grid; gap: 2rem;">
+            <!-- Rentals Section -->
+            <div>
+                <h3
+                    style="color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem;">
+                    Gestión de Alquileres</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Producto</th>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="alquiler : ${alquileres}">
+                                <td th:text="${alquiler.id}">1</td>
+                                <td th:text="${alquiler.usuario.nombre + ' ' + alquiler.usuario.apellido}">Cliente</td>
+                                <td th:text="${alquiler.producto.nombre}">Producto</td>
+                                <td th:text="${alquiler.fechaInicio}">2023-01-01</td>
+                                <td th:text="${alquiler.fechaFin}">2023-01-05</td>
+                                <td>
+                                    <span class="badge" th:text="${alquiler.estado}"
+                                        th:style="${alquiler.estado == 'activo' ? 'background: #d1fae5; color: #10b981;' : (alquiler.estado == 'atrasado' ? 'background: #fee2e2; color: #ef4444;' : 'background: #e5e7eb; color: #6b7280;')}">
+                                        Activo
+                                    </span>
+                                </td>
+                                <td>
+                                    <a th:if="${alquiler.estado == 'activo' or alquiler.estado == 'atrasado'}"
+                                        th:href="@{'/tecnico/return/' + ${alquiler.id}}" class="btn btn-primary"
+                                        style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">
+                                        Devolver
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${alquileres.empty}">
+                                <td colspan="7" style="text-align: center; color: var(--text-light);">No hay alquileres
+                                    registrados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sales Section -->
+            <div>
+                <h3
+                    style="color: var(--secondary-color); border-bottom: 2px solid var(--secondary-color); padding-bottom: 0.5rem;">
+                    Historial de Ventas</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Producto</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="compra : ${compras}">
+                                <td th:text="${compra.id}">1</td>
+                                <td th:text="${compra.usuario.nombre + ' ' + compra.usuario.apellido}">Cliente</td>
+                                <td th:text="${compra.producto.nombre}">Producto</td>
+                                <td th:text="${#temporals.format(compra.fecha, 'dd-MM-yyyy HH:mm')}">2023-01-01 12:00
+                                </td>
+                                <td th:text="${'S/ ' + compra.total}">S/ 100.00</td>
+                            </tr>
+                            <tr th:if="${compras.empty}">
+                                <td colspan="5" style="text-align: center; color: var(--text-light);">No hay ventas
+                                    registradas.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

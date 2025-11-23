@@ -23,11 +23,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String loginProcess(@RequestParam String correo, @RequestParam String contrasena, HttpSession session, Model model) {
+    public String loginProcess(@RequestParam String correo, @RequestParam String contrasena, HttpSession session,
+            Model model) {
         Usuario usuario = usuarioRepository.findByCorreoAndContrasena(correo, contrasena);
         if (usuario != null) {
             session.setAttribute("usuario", usuario);
-            if ("admin".equals(usuario.getRol()) || "tecnico".equals(usuario.getRol())) {
+            if ("admin".equals(usuario.getRol())) {
+                return "redirect:/admin";
+            }
+            if ("tecnico".equals(usuario.getRol())) {
                 return "redirect:/tecnico";
             }
             return "redirect:/";
@@ -52,7 +56,7 @@ public class AuthController {
             model.addAttribute("usuario", usuario);
             return "register";
         }
-        
+
         usuario.setRol("cliente");
         usuarioRepository.save(usuario);
         return "redirect:/login?registered=true";
