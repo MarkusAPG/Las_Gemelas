@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Registro - Las Gemelas</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <header>
+        <h1>✨ Las Gemelas ✨</h1>
+        <nav>
+            <a th:href="@{/}">🏠 Inicio</a>
+            <a th:href="@{/login}">🔐 Login</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <h2 style="text-align: center;">📝 Crear Cuenta</h2>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+            <form th:action="@{/register}" th:object="${usuario}" method="post" id="registerForm">
+                <div class="form-group">
+                    <label>👤 Nombre</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" 
+                           placeholder="Tu nombre" required autocomplete="given-name">
+                </div>
+                <div class="form-group">
+                    <label>👤 Apellido</label>
+                    <input type="text" th:field="*{apellido}" class="form-control" 
+                           placeholder="Tu apellido" required autocomplete="family-name">
+                </div>
+                <div class="form-group">
+                    <label>📧 Correo Electrónico</label>
+                    <input type="email" th:field="*{correo}" class="form-control" 
+                           placeholder="tu@email.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label>🔒 Contraseña</label>
+                    <input type="password" th:field="*{contrasena}" class="form-control" 
+                           placeholder="••••••••" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label>📱 Teléfono</label>
+                    <input type="text" th:field="*{telefono}" class="form-control" 
+                           placeholder="+51 999 999 999" autocomplete="tel">
+                </div>
+                <div class="form-group">
+                    <label>📍 Dirección</label>
+                    <input type="text" th:field="*{direccion}" class="form-control" 
+                           placeholder="Tu dirección" autocomplete="street-address">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                    ✨ Registrarse
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            const inputs = form.querySelectorAll('input');
+            
+            // Add focus animations
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                    this.parentElement.style.transition = 'transform 0.3s ease';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+
+                // Add validation feedback
+                input.addEventListener('input', function() {
+                    if (this.validity.valid) {
+                        this.style.borderColor = 'var(--success-color)';
+                    } else if (this.value.length > 0) {
+                        this.style.borderColor = 'var(--error-color)';
+                    }
+                });
+            });
+
+            // Form submission animation
+            form.addEventListener('submit', function(e) {
+                const button = form.querySelector('button[type="submit"]');
+                button.innerHTML = '⏳ Registrando...';
+                button.style.opacity = '0.7';
+                button.disabled = true;
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login - Las Gemelas</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <header>
+        <h1>✨ Las Gemelas ✨</h1>
+        <nav>
+            <a th:href="@{/}">🏠 Inicio</a>
+            <a th:href="@{/register}">📝 Registrarse</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <h2 style="text-align: center;">🔐 Iniciar Sesión</h2>
+            <div th:if="${param.registered}" class="alert alert-success">
+                ✅ ¡Registro exitoso! Por favor inicia sesión.
+            </div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+            <form th:action="@{/login}" method="post" id="loginForm">
+                <div class="form-group">
+                    <label for="correo">📧 Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" class="form-control" 
+                           placeholder="tu@email.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="contrasena">🔒 Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" class="form-control" 
+                           placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                    🚀 Ingresar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const inputs = form.querySelectorAll('input');
+            
+            // Add focus animations
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                    this.parentElement.style.transition = 'transform 0.3s ease';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+
+            // Form submission animation
+            form.addEventListener('submit', function(e) {
+                const button = form.querySelector('button[type="submit"]');
+                button.innerHTML = '⏳ Ingresando...';
+                button.style.opacity = '0.7';
+                button.disabled = true;
+            });
+        });
+    </script>
+</body>
+</html>

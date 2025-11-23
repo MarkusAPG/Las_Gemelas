@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Panel Técnico - Las Gemelas</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <header>
+        <h1>⚙️ Panel Técnico</h1>
+        <nav>
+            <a th:href="@{/}">🏪 Ver Tienda</a>
+            <a th:href="@{/logout}">🚪 Salir</a>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <!-- Gestión de Productos -->
+        <section style="margin-bottom: 3rem;">
+            <h2>📦 Gestión de Productos</h2>
+
+            <div>
+                <h3>➕ Agregar Nuevo Producto</h3>
+                <form th:action="@{/tecnico/producto/guardar}" th:object="${nuevoProducto}" method="post" id="productForm"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <input type="text" th:field="*{nombre}" placeholder="📝 Nombre del producto" class="form-control" required>
+                    <input type="text" th:field="*{categoria}" placeholder="🏷️ Categoría" class="form-control">
+                    <select th:field="*{tipo}" class="form-control">
+                        <option value="ambos">🔄 Ambos (Venta y Alquiler)</option>
+                        <option value="venta">💰 Solo Venta</option>
+                        <option value="alquiler">📅 Solo Alquiler</option>
+                    </select>
+                    <input type="number" step="0.01" th:field="*{precioVenta}" placeholder="💵 Precio Venta (S/)" 
+                        class="form-control" min="0">
+                    <input type="number" step="0.01" th:field="*{precioAlquiler}" placeholder="📅 Precio Alquiler (S/)" 
+                        class="form-control" min="0">
+                    <input type="number" th:field="*{stock}" placeholder="📊 Stock disponible" 
+                        class="form-control" min="0">
+                    <input type="text" th:field="*{imagen}" placeholder="🖼️ Nombre Imagen (ej: foto.jpg)" 
+                        class="form-control">
+                    <textarea th:field="*{descripcion}" placeholder="📄 Descripción del producto" 
+                        class="form-control" style="grid-column: span 2; min-height: 100px;"></textarea>
+
+                    <button type="submit" class="btn btn-primary" style="grid-column: span 2; margin-top: 0.5rem;">
+                        💾 Guardar Producto
+                    </button>
+                </form>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>📦 Nombre</th>
+                        <th>📊 Stock</th>
+                        <th>✅ Estado</th>
+                        <th>⚙️ Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="prod, iterStat : ${productos}">
+                        <td th:text="${prod.id}">1</td>
+                        <td style="font-weight: 600;" th:text="${prod.nombre}">Producto</td>
+                        <td>
+                            <span style="padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem;"
+                                  th:style="${prod.stock > 10 ? 'background: var(--success-bg); color: var(--success-color);' : 
+                                            (prod.stock > 0 ? 'background: #FEF3C7; color: #D97706;' : 
+                                            'background: var(--error-bg); color: var(--error-color);')}"
+                                  th:text="${prod.stock}">10</span>
+                        </td>
+                        <td>
+                            <span style="padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem;"
+                                  th:style="${prod.estado == 'disponible' ? 'background: var(--success-bg); color: var(--success-color);' : 
+                                            'background: var(--error-bg); color: var(--error-color);'}"
+                                  th:text="${prod.estado}">Disponible</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/tecnico/producto/eliminar/{id}(id=${prod.id})}" 
+                               class="btn btn-danger"
+                               style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"
+                               onclick="return confirm('¿Estás seguro de eliminar este producto?');">
+                                🗑️ Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Gestión de Usuarios -->
+        <section>
+            <h2>👥 Gestión de Usuarios</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>👤 Nombre</th>
+                        <th>📧 Correo</th>
+                        <th>🎭 Rol</th>
+                        <th>⚙️ Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user, iterStat : ${usuarios}">
+                        <td th:text="${user.id}">1</td>
+                        <td style="font-weight: 600;" th:text="${user.nombre + ' ' + user.apellido}">Juan Perez</td>
+                        <td th:text="${user.correo}">juan@mail.com</td>
+                        <td>
+                            <span style="padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem; background: var(--light-purple); color: var(--dark-purple);"
+                                  th:text="${user.rol}">cliente</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/tecnico/usuario/eliminar/{id}(id=${user.id})}" 
+                               class="btn btn-danger"
+                               style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"
+                               onclick="return confirm('¿Estás seguro de eliminar este usuario?');">
+                                🗑️ Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('productForm');
+            const inputs = form.querySelectorAll('input, select, textarea');
+            
+            // Add focus animations
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.transition = 'transform 0.3s ease';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Form submission animation
+            form.addEventListener('submit', function(e) {
+                const button = form.querySelector('button[type="submit"]');
+                button.innerHTML = '⏳ Guardando...';
+                button.style.opacity = '0.7';
+                button.disabled = true;
+            });
+
+            // Add hover effects to table rows
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transition = 'all 0.3s ease';
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
