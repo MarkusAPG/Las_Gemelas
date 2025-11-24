@@ -54,24 +54,7 @@
                         <th>ID</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
-                        <th>Total</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="ticket : ${tickets}">
-                        <td th:text="${ticket.id}">1</td>
-                        <td th:text="${#temporals.format(ticket.fecha, 'dd-MM-yyyy HH:mm')}">01-01-2023</td>
-                        <td th:text="${ticket.usuario.nombre + ' ' + ticket.usuario.apellido}">Cliente</td>
-                        <td th:text="${'S/ ' + ticket.total}">S/ 100.00</td>
-                        <td>
-                            <a th:href="@{'/admin/tickets/' + ${ticket.id}}" class="btn btn-primary"
-                                style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">
-                                Ver Detalle
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
+                        </tbody>
             </table>
         </div>
     </div>

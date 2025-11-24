@@ -27,6 +27,12 @@ public class CartController {
     @Autowired
     private com.lasgemelas.repository.TicketDetalleRepository ticketDetalleRepository;
 
+    @Autowired
+    private com.lasgemelas.repository.CompraRepository compraRepository;
+
+    @Autowired
+    private com.lasgemelas.repository.AlquilerRepository alquilerRepository;
+
     @GetMapping
     public String viewCart(HttpSession session, Model model) {
         List<CartItem> cart = getCart(session);
@@ -54,6 +60,7 @@ public class CartController {
             if (!exists) {
                 cart.add(new CartItem(product, 1, type));
             }
+            session.setAttribute("cart", cart); // Explicitly save cart
             session.setAttribute("cartSize", cart.stream().mapToInt(CartItem::getCantidad).sum());
         }
 
@@ -95,13 +102,15 @@ public class CartController {
         ticket.setTotal(calculateTotal(cart));
         ticket = ticketRepository.save(ticket);
 
-        // Create Details
+        // Create Details and Sales/Rentals
         for (CartItem item : cart) {
+            // Ticket Detail
             com.lasgemelas.model.TicketDetalle detalle = new com.lasgemelas.model.TicketDetalle();
             detalle.setTicket(ticket);
             detalle.setProducto(item.getProducto());
             detalle.setCantidad(item.getCantidad());
             detalle.setTipo(item.getTipo());
+            detalle.setDias(item.getDias());
 
             BigDecimal precio = "alquiler".equals(item.getTipo()) ? item.getProducto().getPrecioAlquiler()
                     : item.getProducto().getPrecioVenta();
@@ -109,12 +118,47 @@ public class CartController {
             detalle.setSubtotal(item.getSubtotal());
 
             ticketDetalleRepository.save(detalle);
+
+            // Create Compra or Alquiler
+            if ("venta".equals(item.getTipo())) {
+                com.lasgemelas.model.Compra compra = new com.lasgemelas.model.Compra();
+                compra.setUsuario(usuario);
+                compra.setProducto(item.getProducto());
+                compra.setCantidad(item.getCantidad());
+                compra.setTotal(item.getSubtotal());
+                compra.setFecha(java.time.LocalDateTime.now());
+                compraRepository.save(compra);
+            } else if ("alquiler".equals(item.getTipo())) {
+                com.lasgemelas.model.Alquiler alquiler = new com.lasgemelas.model.Alquiler();
+                alquiler.setUsuario(usuario);
+                alquiler.setProducto(item.getProducto());
+                alquiler.setCantidad(item.getCantidad());
+                alquiler.setDias(item.getDias());
+                alquiler.setTotal(item.getSubtotal());
+                alquiler.setFechaInicio(java.time.LocalDate.now());
+                alquiler.setFechaFin(java.time.LocalDate.now().plusDays(item.getDias()));
+                alquiler.setEstado("activo");
+                alquilerRepository.save(alquiler);
+            }
         }
 
         // Clear Cart
         clearCart(session);
 
         return "redirect:/cart/ticket/" + ticket.getId();
+    }
+
+    @PostMapping("/update")
+    public String updateCart(@RequestParam int index, @RequestParam int dias, HttpSession session) {
+        List<CartItem> cart = getCart(session);
+        if (index >= 0 && index < cart.size()) {
+            CartItem item = cart.get(index);
+            if ("alquiler".equals(item.getTipo())) {
+                item.setDias(dias);
+                session.setAttribute("cart", cart);
+            }
+        }
+        return "redirect:/cart";
     }
 
     @GetMapping("/ticket/{id}")

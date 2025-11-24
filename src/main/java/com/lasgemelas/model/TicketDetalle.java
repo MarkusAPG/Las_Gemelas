@@ -27,6 +27,8 @@ public class TicketDetalle {
 
     private String tipo; // "venta" or "alquiler"
 
+    private int dias = 1;
+
     // Getters and Setters
     public Integer getId() {
         return id;
@@ -82,5 +84,13 @@ public class TicketDetalle {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+
+    public int getDias() {
+        return dias;
+    }
+
+    public void setDias(int dias) {
+        this.dias = dias;
     }
 }

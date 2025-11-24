@@ -20,7 +20,7 @@ public class Compra {
     private Producto producto;
 
     @Column(name = "id_tecnico")
-    private Long idTecnico;
+    private Integer idTecnico;
 
     private LocalDateTime fecha = LocalDateTime.now();
     private Integer cantidad;
@@ -51,11 +51,11 @@ public class Compra {
         this.producto = producto;
     }
 
-    public Long getIdTecnico() {
+    public Integer getIdTecnico() {
         return idTecnico;
     }
 
-    public void setIdTecnico(Long idTecnico) {
+    public void setIdTecnico(Integer idTecnico) {
         this.idTecnico = idTecnico;
     }
 

@@ -13,7 +13,11 @@
 <body>
     <header>
         <h1>Admin Panel</h1>
-        <nav>
+        <nav style="display: flex; align-items: center; gap: 1.5rem;">
+            <a th:href="@{/admin/products}" style="color: white; text-decoration: none; font-weight: 500;">Productos</a>
+            <a th:href="@{/admin/users}" style="color: white; text-decoration: none; font-weight: 500;">Usuarios</a>
+            <a th:href="@{/admin/tickets}" style="color: white; text-decoration: none; font-weight: 500;">Tickets</a>
+            <a th:href="@{/admin/reports}" style="color: white; text-decoration: none; font-weight: 500;">Reportes</a>
             <!-- User Profile Dropdown -->
             <div class="dropdown">
                 <a href="#" style="display: flex; align-items: center; gap: 0.5rem;">

@@ -24,6 +24,9 @@ public class TechnicianController {
     @Autowired
     private CompraRepository compraRepository;
 
+    @Autowired
+    private com.lasgemelas.repository.TicketRepository ticketRepository;
+
     private boolean isTechnician(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         return usuario != null && "tecnico".equals(usuario.getRol());
@@ -34,9 +37,18 @@ public class TechnicianController {
         if (!isTechnician(session)) {
             return "redirect:/";
         }
-        model.addAttribute("alquileres", alquilerRepository.findAll()); // Show all for now, or filter by active
+        model.addAttribute("alquileres", alquilerRepository.findAll());
         model.addAttribute("compras", compraRepository.findAll());
+        model.addAttribute("tickets", ticketRepository.findAllByOrderByFechaDesc());
         return "tecnico";
+    }
+
+    @GetMapping("/tickets/{id}")
+    public String viewTicket(@PathVariable Integer id, Model model, HttpSession session) {
+        if (!isTechnician(session))
+            return "redirect:/";
+        ticketRepository.findById(id).ifPresent(ticket -> model.addAttribute("ticket", ticket));
+        return "ticket";
     }
 
     @GetMapping("/return/{id}")

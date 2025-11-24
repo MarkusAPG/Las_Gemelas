@@ -102,7 +102,12 @@ public class AdminController {
     public String deleteProduct(@PathVariable Long id, HttpSession session) {
         if (!isAdmin(session))
             return "redirect:/";
-        productoRepository.deleteById(id);
+
+        productoRepository.findById(id).ifPresent(producto -> {
+            producto.setEstado("no disponible");
+            productoRepository.save(producto);
+        });
+
         return "redirect:/admin/products";
     }
 

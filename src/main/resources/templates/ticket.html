@@ -100,8 +100,7 @@
                     <span th:text="${ticket.usuario.correo}">correo@email.com</span>
                 </div>
                 <div style="text-align: right;">
-                    <strong>Fecha:</strong><br>
-                    <span th:text="${#temporals.format(ticket.fecha, 'dd-MM-yyyy HH:mm')}">01-01-2023</span>
+                    <p th:text="${#temporals.format(ticket.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</p>
                 </div>
             </div>
 
@@ -109,35 +108,33 @@
                 <thead>
                     <tr>
                         <th>Producto</th>
-                        <th>Tipo</th>
                         <th>Cant.</th>
-                        <th>Precio Unit.</th>
+                        <th>Precio</th>
                         <th>Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="detalle : ${ticket.detalles}">
                         <td th:text="${detalle.producto.nombre}">Producto</td>
-                        <td th:text="${detalle.tipo}">Venta</td>
                         <td th:text="${detalle.cantidad}">1</td>
-                        <td th:text="${'S/ ' + detalle.precioUnitario}">S/ 10.00</td>
-                        <td th:text="${'S/ ' + detalle.subtotal}">S/ 10.00</td>
+                        <td th:text="${'$' + detalle.precioUnitario}">$100.00</td>
+                        <td th:text="${'$' + detalle.subtotal}">$100.00</td>
                     </tr>
                 </tbody>
             </table>
 
             <div class="ticket-total">
-                Total: S/ <span th:text="${ticket.total}">100.00</span>
+                Total: <span th:text="${'$' + ticket.total}">$100.00</span>
             </div>
 
             <div style="margin-top: 2rem; text-align: center; font-size: 0.9rem; color: #666;">
                 <p>¡Gracias por su preferencia!</p>
             </div>
-        </div>
 
-        <div style="text-align: center; margin-top: 1rem;" class="no-print">
-            <button onclick="downloadPDF()" class="btn btn-primary">Descargar PDF</button>
-            <a th:href="@{/}" class="btn btn-outline" style="margin-left: 1rem;">Volver al Inicio</a>
+            <div style="text-align: center; margin-top: 2rem;" class="no-print">
+                <button onclick="downloadPDF()" class="btn btn-primary">Descargar PDF</button>
+                <a th:href="@{/}" class="btn btn-outline" style="margin-left: 1rem;">Volver al Inicio</a>
+            </div>
         </div>
     </div>
 

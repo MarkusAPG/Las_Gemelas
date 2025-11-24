@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Reportes Diarios - Las Gemelas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .report-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .report-section h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            font-weight: 600;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Panel de Reportes</h1>
+        <nav>
+            <a th:href="@{/admin}">Volver al Admin</a>
+            <a th:href="@{/logout}">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Date Filter -->
+        <div class="report-header">
+            <div>
+                <h2 style="margin: 0;">Reportes del Día</h2>
+                <p style="margin: 0.5rem 0 0; color: #666;"
+                    th:text="${#temporals.format(selectedDate, 'dd MMMM yyyy')}">Fecha</p>
+            </div>
+            <form th:action="@{/admin/reports}" method="get" style="display: flex; gap: 1rem; align-items: center;">
+                <label>Seleccionar Fecha:</label>
+                <input type="date" name="date" th:value="${selectedDate}" required class="form-control">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </form>
+        </div>
+
+        <!-- Key Indicators -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Ventas Totales</div>
+                <div class="stat-value" th:text="${'$' + indicators.totalSalesAmount}">$0.00</div>
+                <div class="stat-label" th:text="${indicators.salesCount + ' transacciones'}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Alquileres Totales</div>
+                <div class="stat-value" th:text="${'$' + indicators.totalRentalsAmount}">$0.00</div>
+                <div class="stat-label" th:text="${indicators.rentalsCount + ' transacciones'}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ingresos Totales</div>
+                <div class="stat-value" th:text="${'$' + financials.dailyIncome}">$0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Valor del Stock</div>
+                <div class="stat-value" th:text="${'$' + financials.stockValue}">$0.00</div>
+            </div>
+        </div>
+
+        <!-- 1. Sales Report -->
+        <div class="report-section">
+            <h2>Reporte de Ventas</h2>
+            <div th:if="${dailySales.empty}" style="text-align: center; padding: 2rem; color: #666;">
+                No hay ventas registradas para esta fecha.
+            </div>
+            <table th:unless="${dailySales.empty}">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Cliente</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Hora</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="venta : ${dailySales}">
+                        <td th:text="${venta.id}">1</td>
+                        <td th:text="${venta.producto.nombre}">Producto</td>
+                        <td th:text="${venta.usuario.nombre + ' ' + venta.usuario.apellido}">Cliente</td>
+                        <td th:text="${venta.cantidad}">1</td>
+                        <td th:text="${'$' + venta.total}">$100.00</td>
+                        <td th:text="${#temporals.format(venta.fecha, 'HH:mm')}">12:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2. Rentals Report -->
+        <div class="report-section">
+            <h2>Reporte de Alquileres</h2>
+            <div th:if="${dailyRentals.empty}" style="text-align: center; padding: 2rem; color: #666;">
+                No hay alquileres registrados para esta fecha.
+            </div>
+            <table th:unless="${dailyRentals.empty}">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Cliente</th>
+                        <th>Días</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="alquiler : ${dailyRentals}">
+                        <td th:text="${alquiler.id}">1</td>
+                        <td th:text="${alquiler.producto.nombre}">Producto</td>
+                        <td th:text="${alquiler.usuario.nombre + ' ' + alquiler.usuario.apellido}">Cliente</td>
+                        <td th:text="${alquiler.dias}">3</td>
+                        <td th:text="${'$' + alquiler.total}">$150.00</td>
+                        <td>
+                            <span th:text="${alquiler.estado}"
+                                th:class="${'badge ' + (alquiler.estado == 'activo' ? 'bg-success' : 'bg-secondary')}">
+                                Activo
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 4. Statistics -->
+        <div class="report-section">
+            <h2>Estadísticas del Día</h2>
+            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="stat-card" style="background: #f8f9fa;">
+                    <div class="stat-label">Venta Máxima</div>
+                    <div class="stat-value" style="font-size: 1.5rem;" th:text="${'$' + statistics.maxSale}">$0.00</div>
+                </div>
+                <div class="stat-card" style="background: #f8f9fa;">
+                    <div class="stat-label">Venta Mínima</div>
+                    <div class="stat-value" style="font-size: 1.5rem;" th:text="${'$' + statistics.minSale}">$0.00</div>
+                </div>
+                <div class="stat-card" style="background: #f8f9fa;">
+                    <div class="stat-label">Promedio de Venta</div>
+                    <div class="stat-value" style="font-size: 1.5rem;" th:text="${'$' + statistics.avgSale}">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Deleted Records -->
+        <div class="report-section">
+            <h2>Registros Eliminados (Productos No Disponibles)</h2>
+            <div th:if="${deletedProducts.empty}" style="text-align: center; padding: 2rem; color: #666;">
+                No hay productos eliminados.
+            </div>
+            <table th:unless="${deletedProducts.empty}">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio Venta</th>
+                        <th>Stock Restante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="prod : ${deletedProducts}">
+                        <td th:text="${prod.id}">1</td>
+                        <td th:text="${prod.nombre}">Nombre</td>
+                        <td th:text="${prod.categoria}">Cat</td>
+                        <td th:text="${'$' + prod.precioVenta}">$0.00</td>
+                        <td th:text="${prod.stock}">0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Inventory Summary (Optional full list or just stats) -->
+        <div class="report-section">
+            <h2>Resumen de Inventario</h2>
+            <p>Total de productos en catálogo: <strong th:text="${inventory.size()}">0</strong></p>
+        </div>
+
+    </div>
+</body>
+
+</html>
