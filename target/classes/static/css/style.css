@@ -89,6 +89,23 @@ nav span {
     color: var(--text-light);
 }
 
+.admin-nav-link {
+    background-color: var(--primary-color);
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+}
+
+.admin-nav-link:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3);
+}
+
 /* Dropdown Menu */
 .dropdown {
     position: relative;
