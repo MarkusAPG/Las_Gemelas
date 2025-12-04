@@ -1,8 +1,10 @@
 C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\controller\AuthController.java
+C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\model\Reporte.java
 C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\repository\TicketDetalleRepository.java
 C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\repository\CompraRepository.java
 C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\model\Compra.java
 C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\model\CartItem.java
+C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\repository\ReporteRepository.java
 C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\controller\ReportController.java
 C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\controller\AdminController.java
 C:\Users\vasqu\OneDrive\Desktop\Las Gemelas\src\main\java\com\lasgemelas\model\Alquiler.java

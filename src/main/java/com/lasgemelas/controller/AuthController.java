@@ -79,6 +79,15 @@ public class AuthController {
             return "register";
         }
 
+        // Password Validation
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$";
+        if (!usuario.getContrasena().matches(passwordPattern)) {
+            model.addAttribute("error",
+                    "La contraseña debe tener al menos 8 caracteres, un número, una mayúscula y un carácter especial (@#$%^&+=!).");
+            model.addAttribute("usuario", usuario);
+            return "register";
+        }
+
         usuario.setRol("cliente");
         usuarioRepository.save(usuario);
         return "redirect:/login?registered=true";

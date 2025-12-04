@@ -127,6 +127,134 @@
         .tab-content.active {
             display: block;
         }
+
+        /* Indicator Card Styles */
+        .indicator-section-title {
+            font-size: 1.2rem;
+            color: #444;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin: 0.5rem 0;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-subtext {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-top: auto;
+        }
+
+        /* Color Variants */
+        .card-blue .stat-icon {
+            background: #ebf8ff;
+            color: #3182ce;
+        }
+
+        .card-blue .stat-value {
+            color: #2b6cb0;
+        }
+
+        .card-green .stat-icon {
+            background: #f0fff4;
+            color: #38a169;
+        }
+
+        .card-green .stat-value {
+            color: #2f855a;
+        }
+
+        .card-purple .stat-icon {
+            background: #faf5ff;
+            color: #805ad5;
+        }
+
+        .card-purple .stat-value {
+            color: #6b46c1;
+        }
+
+        .card-orange .stat-icon {
+            background: #fffaf0;
+            color: #dd6b20;
+        }
+
+        .card-orange .stat-value {
+            color: #c05621;
+        }
+
+        .card-red .stat-icon {
+            background: #fff5f5;
+            color: #e53e3e;
+        }
+
+        .card-red .stat-value {
+            color: #c53030;
+        }
+
+        .card-teal .stat-icon {
+            background: #e6fffa;
+            color: #319795;
+        }
+
+        .card-teal .stat-value {
+            color: #2c7a7b;
+        }
     </style>
 </head>
 
@@ -188,20 +316,22 @@
             <button class="tab-btn" onclick="openTab(event, 'tab3')">3. Indicadores</button>
             <button class="tab-btn" onclick="openTab(event, 'tab4')">4. Estadísticas</button>
             <button class="tab-btn" onclick="openTab(event, 'tab5')">5. Eliminados</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab6')">6. Actividad Admin</button>
         </div>
 
-        <!-- Tab 1: Transacciones (Voucher) -->
+        <!-- Tab 1: Transacciones (Unified) -->
         <div id="tab1" class="tab-content active">
             <div class="report-section">
-                <h2>Reporte 1: Transacciones (Detalle de Vouchers)</h2>
-                <div th:if="${sales.empty}" style="text-align: center; padding: 2rem; color: #666;">
+                <h2>Reporte 1: Transacciones (Ventas y Alquileres)</h2>
+                <div th:if="${transactions.empty}" style="text-align: center; padding: 2rem; color: #666;">
                     No hay transacciones registradas en este rango.
                 </div>
-                <table th:unless="${sales.empty}">
+                <table th:unless="${transactions.empty}">
                     <thead>
                         <tr>
-                            <th>ID Venta</th>
+                            <th>ID</th>
                             <th>Fecha/Hora</th>
+                            <th>Tipo</th>
                             <th>Cliente</th>
                             <th>Producto</th>
                             <th>Cantidad</th>
@@ -209,15 +339,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="venta : ${sales}">
-                            <td th:text="${venta.id}">1</td>
-                            <td th:text="${#temporals.format(venta.fecha, 'dd/MM/yyyy HH:mm')}">Date
+                        <tr th:each="t : ${transactions}">
+                            <td th:text="${t.id}">1</td>
+                            <td th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy HH:mm')}">Date</td>
+                            <td>
+                                <span th:text="${t.tipo}"
+                                    th:style="${t.tipo == 'Venta' ? 'background-color: #dbeafe; color: #1e40af; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;' : 'background-color: #fce7f3; color: #9d174d; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;'}">Tipo</span>
                             </td>
-                            <td th:text="${venta.usuario.nombre + ' ' + venta.usuario.apellido}">
-                                User</td>
-                            <td th:text="${venta.producto.nombre}">Product</td>
-                            <td th:text="${venta.cantidad}">1</td>
-                            <td th:text="${'$' + venta.total}">$100.00</td>
+                            <td th:text="${t.usuario.nombre + ' ' + t.usuario.apellido}">User</td>
+                            <td th:text="${t.producto.nombre}">Product</td>
+                            <td th:text="${t.cantidad}">1</td>
+                            <td th:text="${'$' + t.total}">$100.00</td>
                         </tr>
                     </tbody>
                 </table>
@@ -287,19 +419,159 @@
         <!-- Tab 3: Indicadores -->
         <div id="tab3" class="tab-content">
             <div class="report-section">
-                <h2>Reporte 3: Indicadores Generales</h2>
+                <h2>Reporte 3: Indicadores de Desempeño (KPIs)</h2>
+
+                <h3 class="indicator-section-title">📊 Indicadores Generales</h3>
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Ventas Totales</div>
-                        <div class="stat-value" th:text="${'$' + indicators.totalSalesAmount}">$0.00
+                    <div class="stat-card card-blue">
+                        <div class="stat-header">
+                            <div class="stat-icon">🛒</div>
                         </div>
-                        <div class="stat-label" th:text="${indicators.salesCount + ' transacciones'}">0</div>
+                        <div class="stat-value" th:text="${'$' + indicators.totalSalesAmount}">$0.00</div>
+                        <div class="stat-label">Ventas Totales</div>
+                        <div class="stat-subtext" th:text="${indicators.salesCount + ' transacciones'}">0</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card card-blue">
+                        <div class="stat-header">
+                            <div class="stat-icon">🤝</div>
+                        </div>
+                        <div class="stat-value" th:text="${'$' + indicators.totalRentalsAmount}">$0.00</div>
                         <div class="stat-label">Alquileres Totales</div>
-                        <div class="stat-value" th:text="${'$' + indicators.totalRentalsAmount}">
-                            $0.00</div>
-                        <div class="stat-label" th:text="${indicators.rentalsCount + ' transacciones'}">0</div>
+                        <div class="stat-subtext" th:text="${indicators.rentalsCount + ' transacciones'}">0</div>
+                    </div>
+                </div>
+
+                <h3 class="indicator-section-title">🌐 Indicadores Externos</h3>
+                <div class="stats-grid">
+                    <div class="stat-card card-teal">
+                        <div class="stat-header">
+                            <div class="stat-icon">🎯</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.conversionRate + '%'}">0%</div>
+                        <div class="stat-label">Tasa de Conversión</div>
+                        <div class="stat-subtext">Estimado</div>
+                    </div>
+                    <div class="stat-card card-teal">
+                        <div class="stat-header">
+                            <div class="stat-icon">⭐</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.customerSatisfaction}">0/5</div>
+                        <div class="stat-label">Satisfacción Cliente</div>
+                    </div>
+                    <div class="stat-card card-teal">
+                        <div class="stat-header">
+                            <div class="stat-icon">📦</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.occupancyRate + '%'}">0%</div>
+                        <div class="stat-label">Ocupación Inventario</div>
+                    </div>
+                </div>
+
+                <h3 class="indicator-section-title">📉 Gestión y Pérdidas</h3>
+                <div class="stats-grid">
+                    <div class="stat-card card-orange">
+                        <div class="stat-header">
+                            <div class="stat-icon">🔄</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.inventoryTurnover}">0.00</div>
+                        <div class="stat-label">Rotación Inventario</div>
+                    </div>
+                    <div class="stat-card card-red">
+                        <div class="stat-header">
+                            <div class="stat-icon">⚠️</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.lossPercentage + '%'}">0%</div>
+                        <div class="stat-label">Porcentaje de Pérdidas</div>
+                    </div>
+                    <div class="stat-card card-orange">
+                        <div class="stat-header">
+                            <div class="stat-icon">⏱️</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.replenishmentTime}">0 días</div>
+                        <div class="stat-label">Tiempo Reposición</div>
+                    </div>
+                </div>
+
+                <h3 class="indicator-section-title">💰 Financieros y Crecimiento</h3>
+                <div class="stats-grid">
+                    <div class="stat-card card-green">
+                        <div class="stat-header">
+                            <div class="stat-icon">📈</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.salesGrowthRate + '%'}">0%</div>
+                        <div class="stat-label">Crecimiento Ventas</div>
+                    </div>
+                    <div class="stat-card card-green">
+                        <div class="stat-header">
+                            <div class="stat-icon">💵</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.profitMargin}">0%</div>
+                        <div class="stat-label">Margen Utilidad</div>
+                        <div class="stat-subtext">Estimado</div>
+                    </div>
+                    <div class="stat-card card-red">
+                        <div class="stat-header">
+                            <div class="stat-icon">🚫</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.delinquencyRate + '%'}">0%</div>
+                        <div class="stat-label">Tasa Morosidad</div>
+                    </div>
+                </div>
+
+                <h3 class="indicator-section-title">👥 Clientes y Procesos</h3>
+                <div class="stats-grid">
+                    <div class="stat-card card-purple">
+                        <div class="stat-header">
+                            <div class="stat-icon">🔄</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.newVsRecurring}">0/0</div>
+                        <div class="stat-label">Nuevos vs Recurrentes</div>
+                    </div>
+                    <div class="stat-card card-purple">
+                        <div class="stat-header">
+                            <div class="stat-icon">⏳</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.avgRentalDuration}">0 días</div>
+                        <div class="stat-label">Duración Prom. Alquiler</div>
+                    </div>
+                    <div class="stat-card card-purple">
+                        <div class="stat-header">
+                            <div class="stat-icon">⚡</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.billingEfficiency}">0%</div>
+                        <div class="stat-label">Eficiencia Facturación</div>
+                    </div>
+                    <div class="stat-card card-purple">
+                        <div class="stat-header">
+                            <div class="stat-icon">📅</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.scheduleCompliance}">0%</div>
+                        <div class="stat-label">Cumplimiento Cronogramas</div>
+                    </div>
+                </div>
+
+                <h3 class="indicator-section-title">🏆 Mercado y Calidad</h3>
+                <div class="stats-grid">
+                    <div class="stat-card card-blue">
+                        <div class="stat-header">
+                            <div class="stat-icon">🌍</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.marketShare}">0%</div>
+                        <div class="stat-label">Participación Mercado</div>
+                    </div>
+                    <div class="stat-card card-blue">
+                        <div class="stat-header">
+                            <div class="stat-icon">📢</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.unsatisfiedDemand}">0%</div>
+                        <div class="stat-label">Demanda Insatisfecha</div>
+                    </div>
+                    <div class="stat-card card-red">
+                        <div class="stat-header">
+                            <div class="stat-icon">↩️</div>
+                        </div>
+                        <div class="stat-value" th:text="${indicators.returnRate}">0%</div>
+                        <div class="stat-label">Tasa Devoluciones</div>
                     </div>
                 </div>
             </div>
@@ -385,26 +657,57 @@
         <div id="tab5" class="tab-content">
             <div class="report-section">
                 <h2>Reporte 5: Registro de Eliminados</h2>
-                <div th:if="${deletedProducts.empty}" style="text-align: center; padding: 2rem; color: #666;">
-                    No hay productos eliminados.
+                <div th:if="${adminReports.empty}" style="text-align: center; padding: 2rem; color: #666;">
+                    No hay registros eliminados.
                 </div>
-                <table th:unless="${deletedProducts.empty}">
+                <table th:unless="${adminReports.empty}">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Categoría</th>
-                            <th>Precio Venta</th>
-                            <th>Stock Restante</th>
+                            <th>Fecha/Hora</th>
+                            <th>Entidad</th>
+                            <th>Descripción</th>
+                            <th>Admin</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="prod : ${deletedProducts}">
-                            <td th:text="${prod.id}">1</td>
-                            <td th:text="${prod.nombre}">Nombre</td>
-                            <td th:text="${prod.categoria}">Cat</td>
-                            <td th:text="${'$' + prod.precioVenta}">$0.00</td>
-                            <td th:text="${prod.stock}">0</td>
+                        <tr th:each="report : ${adminReports}" th:if="${report.tipoAccion == 'DELETE'}">
+                            <td th:text="${#temporals.format(report.fecha, 'dd/MM/yyyy HH:mm')}">Date</td>
+                            <td th:text="${report.entidad}">Entity</td>
+                            <td th:text="${report.descripcion}">Desc</td>
+                            <td th:text="${report.usuario.nombre}">Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 6: Actividad Admin -->
+        <div id="tab6" class="tab-content">
+            <div class="report-section">
+                <h2>Reporte 6: Actividad de Administrador</h2>
+                <div th:if="${adminReports.empty}" style="text-align: center; padding: 2rem; color: #666;">
+                    No hay actividad registrada.
+                </div>
+                <table th:unless="${adminReports.empty}">
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Admin</th>
+                            <th>Acción</th>
+                            <th>Entidad</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="report : ${adminReports}">
+                            <td th:text="${#temporals.format(report.fecha, 'dd/MM/yyyy HH:mm')}">Date</td>
+                            <td th:text="${report.usuario.nombre}">Admin</td>
+                            <td>
+                                <span th:text="${report.tipoAccion}"
+                                    th:style="${report.tipoAccion == 'CREATE' ? 'color: #166534; background: #dcfce7; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;' : (report.tipoAccion == 'DELETE' ? 'color: #991b1b; background: #fee2e2; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;' : 'color: #1e40af; background: #dbeafe; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;')}">Action</span>
+                            </td>
+                            <td th:text="${report.entidad}">Entity</td>
+                            <td th:text="${report.descripcion}">Desc</td>
                         </tr>
                     </tbody>
                 </table>

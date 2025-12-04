@@ -151,6 +151,14 @@ public class CartController {
                 alquiler.setEstado("activo");
                 alquilerRepository.save(alquiler);
             }
+
+            // Reduce Stock
+            Producto producto = item.getProducto();
+            if (producto.getStock() != null) {
+                int newStock = Math.max(0, producto.getStock() - item.getCantidad());
+                producto.setStock(newStock);
+                productoRepository.save(producto);
+            }
         }
 
         // Clear Cart

@@ -14,7 +14,7 @@ public class ProductController {
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("productos", productoRepository.findAll());
+        model.addAttribute("productos", productoRepository.findByEstado("disponible"));
         return "index";
     }
 }

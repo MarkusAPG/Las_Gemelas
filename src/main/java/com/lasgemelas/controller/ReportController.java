@@ -25,6 +25,9 @@ public class ReportController {
         return usuario != null && "admin".equals(usuario.getRol());
     }
 
+    @Autowired
+    private com.lasgemelas.repository.ReporteRepository reporteRepository;
+
     @GetMapping
     public String viewReports(
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -50,6 +53,7 @@ public class ReportController {
         // 1. & 2. Sales and Rentals (Range)
         model.addAttribute("sales", reportService.getSalesByDateRange(startDate, endDate));
         model.addAttribute("rentals", reportService.getRentalsByDateRange(startDate, endDate));
+        model.addAttribute("transactions", reportService.getAllTransactions(startDate, endDate));
 
         // Inventory is static
         model.addAttribute("inventory", reportService.getInventory());
@@ -65,6 +69,10 @@ public class ReportController {
 
         // 6. Financials
         model.addAttribute("financials", reportService.getFinancials(startDate, endDate));
+
+        // 7. Admin Activity
+        model.addAttribute("adminReports", reporteRepository.findByFechaBetweenOrderByFechaDesc(
+                startDate.atStartOfDay(), endDate.atTime(java.time.LocalTime.MAX)));
 
         return "admin/reports";
     }

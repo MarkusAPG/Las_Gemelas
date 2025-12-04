@@ -47,10 +47,40 @@
                             <th>Cantidad</th>
                             <th>Subtotal</th>
                             <th>Acción</th>
-                            th:style="${item.tipo == 'alquiler' ? 'background: rgba(219, 39, 119, 0.1); color:
-                            var(--secondary-color);' : ''}">
-                            Tipo
-                            </span>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item, stat : ${cart}">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <img th:if="${item.producto.imagen != null}"
+                                        th:src="@{'/uploads/' + ${item.producto.imagen}}"
+                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                    <span th:text="${item.producto.nombre}">Producto</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span
+                                    th:style="${item.tipo == 'alquiler' ? 'background: rgba(219, 39, 119, 0.1); color: var(--secondary-color); padding: 0.2rem 0.5rem; border-radius: 4px;' : 'padding: 0.2rem 0.5rem; border-radius: 4px; background: #f3f4f6;'}">
+                                    <span th:text="${#strings.capitalize(item.tipo)}">Tipo</span>
+                                </span>
+                                <div th:if="${item.tipo == 'alquiler'}" style="margin-top: 0.5rem;">
+                                    <form th:action="@{/cart/update}" method="post"
+                                        style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="hidden" name="index" th:value="${stat.index}">
+                                        <label style="font-size: 0.8rem;">Días:</label>
+                                        <input type="number" name="dias" th:value="${item.dias}" min="1" max="30"
+                                            style="width: 50px; padding: 0.2rem; border: 1px solid #ddd; border-radius: 4px;">
+                                        <button type="submit" class="btn btn-primary"
+                                            style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">✓</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                S/ <span
+                                    th:text="${item.tipo == 'alquiler' ? item.producto.precioAlquiler : item.producto.precioVenta}">0.00</span>
+                            </td>
+                            <td th:text="${item.cantidad}">1</td>
                             <td style="font-weight: 700; color: var(--primary-color);">
                                 S/ <span th:text="${item.subtotal}">0.00</span>
                             </td>
@@ -61,7 +91,7 @@
                                 </a>
                             </td>
                         </tr>
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
 

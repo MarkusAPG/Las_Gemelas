@@ -27,10 +27,21 @@ public class AdminController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private com.lasgemelas.repository.ReporteRepository reporteRepository;
+
     // Helper to check admin role
     private boolean isAdmin(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         return usuario != null && "admin".equals(usuario.getRol());
+    }
+
+    private void logAction(String action, String entity, String description, HttpSession session) {
+        Usuario admin = (Usuario) session.getAttribute("usuario");
+        if (admin != null) {
+            com.lasgemelas.model.Reporte reporte = new com.lasgemelas.model.Reporte(action, entity, description, admin);
+            reporteRepository.save(reporte);
+        }
     }
 
     @GetMapping("/dashboard")
@@ -87,6 +98,8 @@ public class AdminController {
         }
 
         productoRepository.save(producto);
+        logAction(producto.getId() == null ? "CREATE" : "UPDATE", "PRODUCTO",
+                "Guardó el producto: " + producto.getNombre(), session);
         return "redirect:/admin/products";
     }
 
@@ -97,21 +110,68 @@ public class AdminController {
 
         Producto producto = productoRepository.findById(id).orElse(null);
         if (producto != null) {
+            int oldStock = producto.getStock();
             producto.setStock(stock);
             productoRepository.save(producto);
+            logAction("UPDATE", "PRODUCTO",
+                    "Actualizó stock de " + producto.getNombre() + " de " + oldStock + " a " + stock, session);
         }
         return "redirect:/admin/products";
     }
 
-    @GetMapping("/products/delete/{id}")
-    public String deleteProduct(@PathVariable Long id, HttpSession session) {
+    @GetMapping("/products/toggle/{id}")
+    public String toggleProductStatus(@PathVariable Long id, HttpSession session) {
         if (!isAdmin(session))
             return "redirect:/";
 
         productoRepository.findById(id).ifPresent(producto -> {
-            producto.setEstado("no disponible");
+            String oldStatus = producto.getEstado();
+            String newStatus = "disponible".equals(oldStatus) ? "no disponible" : "disponible";
+            producto.setEstado(newStatus);
             productoRepository.save(producto);
+
+            logAction("UPDATE", "PRODUCTO",
+                    "Cambió estado de " + producto.getNombre() + " de " + oldStatus + " a " + newStatus, session);
         });
+
+        return "redirect:/admin/products";
+    }
+
+    @Autowired
+    private com.lasgemelas.repository.CompraRepository compraRepository;
+
+    @Autowired
+    private com.lasgemelas.repository.AlquilerRepository alquilerRepository;
+
+    @Autowired
+    private com.lasgemelas.repository.TicketDetalleRepository ticketDetalleRepository;
+
+    @GetMapping("/products/delete/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public String deleteProduct(@PathVariable Long id, HttpSession session,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (!isAdmin(session))
+            return "redirect:/";
+
+        try {
+            productoRepository.findById(id).ifPresent(producto -> {
+                // Cascade delete related records
+                ticketDetalleRepository.deleteByProductoId(id);
+                compraRepository.deleteByProductoId(id);
+                alquilerRepository.deleteByProductoId(id);
+
+                // Delete the product
+                productoRepository.delete(producto);
+                logAction("DELETE", "PRODUCTO",
+                        "Eliminó el producto: " + producto.getNombre() + " y sus registros relacionados", session);
+                redirectAttributes.addFlashAttribute("success",
+                        "Producto y todos sus registros relacionados eliminados correctamente.");
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error",
+                    "Ocurrió un error al eliminar el producto: " + e.getMessage());
+        }
 
         return "redirect:/admin/products";
     }
@@ -142,6 +202,8 @@ public class AdminController {
         if (!isAdmin(session))
             return "redirect:/";
         usuarioRepository.save(usuario);
+        logAction("CREATE", "USUARIO", "Creó el usuario: " + usuario.getNombre() + " (" + usuario.getRol() + ")",
+                session);
         return "redirect:/admin/users";
     }
 

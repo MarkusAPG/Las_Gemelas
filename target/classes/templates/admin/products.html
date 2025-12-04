@@ -32,6 +32,16 @@
     </header>
 
     <div class="container">
+        <!-- Alerts -->
+        <div th:if="${success}"
+            style="background-color: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <span th:text="${success}"></span>
+        </div>
+        <div th:if="${error}"
+            style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <span th:text="${error}"></span>
+        </div>
+
         <h2>Gestión de Productos</h2>
 
         <!-- Add Product Form -->
@@ -93,9 +103,48 @@
                         <th>Tipo</th>
                         <th>Venta</th>
                         <th>Alquiler</th>
-                        <input type="number" name="stock" th:value="${prod.stock}" style="width: 60px; padding: 0.2rem;"
-                            class="form-control">
-                        <button type="submit" class="btn btn-primary" </div>
+                        <th>Disponibilidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="prod : ${productos}">
+                        <td th:text="${prod.id}">1</td>
+                        <td>
+                            <img th:if="${prod.imagen != null}" th:src="@{'/uploads/' + ${prod.imagen}}"
+                                style="width: 50px; height: 50px; object-fit: cover;">
+                            <span th:if="${prod.imagen == null}">No img</span>
+                        </td>
+                        <td th:text="${prod.nombre}">Producto</td>
+                        <td>
+                            <form th:action="@{/admin/products/updateStock}" method="post"
+                                style="display: flex; gap: 0.5rem;">
+                                <input type="hidden" name="id" th:value="${prod.id}">
+                                <input type="number" name="stock" th:value="${prod.stock}"
+                                    style="width: 60px; padding: 0.2rem;" class="form-control">
+                                <button type="submit" class="btn btn-primary"
+                                    style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">✓</button>
+                            </form>
+                        </td>
+                        <td th:text="${prod.tipo}">Venta</td>
+                        <td th:text="${prod.precioVenta}">0.00</td>
+                        <td th:text="${prod.precioAlquiler}">0.00</td>
+                        <td>
+                            <a th:href="@{/admin/products/toggle/{id}(id=${prod.id})}" class="btn"
+                                th:style="${prod.estado == 'disponible' ? 'background-color: #ef4444; color: white;' : 'background-color: #22c55e; color: white;'}"
+                                th:text="${prod.estado == 'disponible' ? 'Desactivar' : 'Activar'}"
+                                style="padding: 0.2rem 0.5rem; font-size: 0.8rem; margin-right: 0.5rem;">
+                                Toggle
+                            </a>
+                            <a th:href="@{/admin/products/delete/{id}(id=${prod.id})}" class="btn"
+                                style="background-color: #ef4444; color: white; padding: 0.2rem 0.5rem; font-size: 0.8rem;"
+                                onclick="return confirm('¿Estás seguro de eliminar este producto?')">Eliminar</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 
 </html>

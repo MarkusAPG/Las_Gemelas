@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CompraRepository extends JpaRepository<Compra, Long> {
     List<Compra> findByFechaBetween(LocalDateTime start, LocalDateTime end);
+
+    void deleteByProductoId(Long productoId);
 }

@@ -9,4 +9,6 @@ public interface AlquilerRepository extends JpaRepository<Alquiler, Long> {
     List<Alquiler> findByEstado(String estado);
 
     List<Alquiler> findByFechaRegistroBetween(LocalDateTime start, LocalDateTime end);
+
+    void deleteByProductoId(Long productoId);
 }
