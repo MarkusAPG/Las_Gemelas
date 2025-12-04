@@ -38,7 +38,7 @@ public class ReportController {
 
         // Default to today if no date provided
         if (startDate == null) {
-            startDate = LocalDate.now();
+            startDate = LocalDate.now().minusDays(30);
         }
         if (endDate == null) {
             endDate = startDate; // Default to single day if end date not provided
