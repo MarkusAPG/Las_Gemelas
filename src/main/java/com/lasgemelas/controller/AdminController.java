@@ -33,11 +33,16 @@ public class AdminController {
         return usuario != null && "admin".equals(usuario.getRol());
     }
 
-    @GetMapping
+    @GetMapping("/dashboard")
     public String dashboard(HttpSession session) {
         if (!isAdmin(session))
             return "redirect:/";
-        return "redirect:/admin/products"; // Default to products view
+        return "admin/dashboard";
+    }
+
+    @GetMapping
+    public String adminIndex(HttpSession session) {
+        return "redirect:/admin/dashboard";
     }
 
     // --- Product Management ---
@@ -114,10 +119,20 @@ public class AdminController {
     // --- User Management ---
 
     @GetMapping("/users")
-    public String listUsers(HttpSession session, Model model) {
+    public String listUsers(@RequestParam(required = false) String role, HttpSession session, Model model) {
         if (!isAdmin(session))
             return "redirect:/";
-        model.addAttribute("usuarios", usuarioRepository.findAll());
+
+        if (role != null && !role.isEmpty()) {
+            // Filter by role if provided
+            model.addAttribute("usuarios", usuarioRepository.findAll().stream()
+                    .filter(u -> role.equals(u.getRol()))
+                    .toList());
+            model.addAttribute("currentRole", role);
+        } else {
+            model.addAttribute("usuarios", usuarioRepository.findAll());
+        }
+
         model.addAttribute("usuario", new Usuario()); // Form backing object
         return "admin/users";
     }

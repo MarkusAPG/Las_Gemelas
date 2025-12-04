@@ -27,7 +27,8 @@ public class ReportController {
 
     @GetMapping
     public String viewReports(
-            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             HttpSession session,
             Model model) {
 
@@ -35,28 +36,35 @@ public class ReportController {
             return "redirect:/";
         }
 
-        if (date == null) {
-            date = LocalDate.now();
+        // Default to today if no date provided
+        if (startDate == null) {
+            startDate = LocalDate.now();
+        }
+        if (endDate == null) {
+            endDate = startDate; // Default to single day if end date not provided
         }
 
-        model.addAttribute("selectedDate", date);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
 
-        // 1. & 2. Sales, Rentals, Inventory
-        model.addAttribute("dailySales", reportService.getDailySales(date));
-        model.addAttribute("dailyRentals", reportService.getDailyRentals(date));
+        // 1. & 2. Sales and Rentals (Range)
+        model.addAttribute("sales", reportService.getSalesByDateRange(startDate, endDate));
+        model.addAttribute("rentals", reportService.getRentalsByDateRange(startDate, endDate));
+
+        // Inventory is static
         model.addAttribute("inventory", reportService.getInventory());
 
         // 3. Indicators
-        model.addAttribute("indicators", reportService.getIndicators(date));
+        model.addAttribute("indicators", reportService.getIndicators(startDate, endDate));
 
         // 4. Statistics
-        model.addAttribute("statistics", reportService.getStatistics(date));
+        model.addAttribute("statistics", reportService.getStatistics(startDate, endDate));
 
         // 5. Deleted Records
         model.addAttribute("deletedProducts", reportService.getDeletedProducts());
 
         // 6. Financials
-        model.addAttribute("financials", reportService.getFinancials(date));
+        model.addAttribute("financials", reportService.getFinancials(startDate, endDate));
 
         return "admin/reports";
     }

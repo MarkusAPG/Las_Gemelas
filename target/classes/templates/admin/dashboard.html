@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Admin Dashboard - Las Gemelas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <nav style="display: flex; align-items: center; gap: 1.5rem;">
+            <a th:href="@{/}" target="_blank">Ver Tienda</a>
+            <div class="dropdown">
+                <a href="#" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span th:text="${session.usuario.nombre}">Admin</span>
+                    <span style="font-size: 0.8rem;">▼</span>
+                </a>
+                <div class="dropdown-content">
+                    <a th:href="@{/logout}">Cerrar Sesión</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Panel de Control</h2>
+        <p>Bienvenido, <span th:text="${session.usuario.nombre}">Admin</span>. ¿Qué deseas gestionar hoy?</p>
+
+        <div class="dashboard-grid">
+            <!-- Admins -->
+            <a th:href="@{/admin/users(role='admin')}" class="dashboard-card">
+                <div class="card-icon">🛡️</div>
+                <div class="card-title">Admins</div>
+                <div class="card-desc">Gestionar administradores del sistema</div>
+            </a>
+
+            <!-- Clientes -->
+            <a th:href="@{/admin/users(role='cliente')}" class="dashboard-card">
+                <div class="card-icon">👥</div>
+                <div class="card-title">Clientes</div>
+                <div class="card-desc">Ver y gestionar cuentas de clientes</div>
+            </a>
+
+            <!-- Pedidos (Reportes por ahora) -->
+            <a th:href="@{/admin/reports}" class="dashboard-card">
+                <div class="card-icon">📦</div>
+                <div class="card-title">Pedidos</div>
+                <div class="card-desc">Monitorear ventas y alquileres</div>
+            </a>
+
+            <!-- Productos -->
+            <a th:href="@{/admin/products}" class="dashboard-card">
+                <div class="card-icon">🎭</div>
+                <div class="card-title">Productos</div>
+                <div class="card-desc">Gestionar inventario de disfraces</div>
+            </a>
+
+            <!-- Quejas (Tickets) -->
+            <a th:href="@{/admin/tickets}" class="dashboard-card">
+                <div class="card-icon">🎫</div>
+                <div class="card-title">Quejas</div>
+                <div class="card-desc">Atender tickets y reclamos</div>
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

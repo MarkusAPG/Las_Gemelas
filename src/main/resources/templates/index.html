@@ -44,13 +44,64 @@
     </header>
 
     <div class="container">
+        <!-- Announcement Banner -->
+        <!-- Carousel -->
+        <div class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item">
+                    <img src="https://placehold.co/1200x500/7c3aed/ffffff?text=Bienvenidos+a+Las+Gemelas" alt="Slide 1">
+                    <div class="carousel-caption">
+                        <h3>Bienvenidos a Las Gemelas</h3>
+                        <p>Encuentra los mejores disfraces para tus fiestas y eventos.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://placehold.co/1200x500/db2777/ffffff?text=Gran+Variedad" alt="Slide 2">
+                    <div class="carousel-caption">
+                        <h3>Gran Variedad</h3>
+                        <p>Disfraces para todas las edades y temáticas.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://placehold.co/1200x500/8b5cf6/ffffff?text=Alquiler+y+Venta" alt="Slide 3">
+                    <div class="carousel-caption">
+                        <h3>Alquiler y Venta</h3>
+                        <p>Elige la opción que mejor se adapte a ti.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control carousel-prev" onclick="moveCarousel(-1)">❮</button>
+            <button class="carousel-control carousel-next" onclick="moveCarousel(1)">❯</button>
+        </div>
+
+        <script>
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.carousel-item');
+            const totalSlides = slides.length;
+
+            function moveCarousel(direction) {
+                currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+                updateCarousel();
+            }
+
+            function updateCarousel() {
+                const offset = -currentSlide * 100;
+                document.querySelector('.carousel-inner').style.transform = `translateX(${offset}%)`;
+            }
+
+            // Auto advance
+            setInterval(() => moveCarousel(1), 5000);
+        </script>
+
         <h2>Nuestros Disfraces</h2>
 
         <div class="product-grid">
             <div class="card" th:each="producto : ${productos}">
                 <!-- Improved image handling to prevent flickering -->
-                <div style="overflow: hidden; position: relative;">
-                    <img th:src="@{'/img/' + ${producto.imagen}}" alt="Disfraz"
+                <div
+                    style="overflow: hidden; position: relative; height: 300px; display: flex; align-items: center; justify-content: center; background: #f8f9fa;">
+                    <img th:src="@{'/product-images/' + ${producto.imagen}}" alt="Disfraz"
+                        style="max-width: 100%; max-height: 100%; object-fit: contain;"
                         onerror="this.onerror=null; this.src='https://placehold.co/400x300/7c3aed/ffffff?text=Sin+Imagen';">
                 </div>
 
@@ -94,6 +145,102 @@
             </div>
         </div>
     </div>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <span id="toast-message">Producto agregado al carrito</span>
+        </div>
+    </div>
+
+    <style>
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            right: 30px;
+            bottom: 30px;
+            font-size: 17px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+
+        .toast.success {
+            background-color: #10B981;
+            /* Green */
+        }
+
+        .toast.error {
+            background-color: #EF4444;
+            /* Red */
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const forms = document.querySelectorAll('form[action="/cart/add"]');
+
+            forms.forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(this);
+                    const button = this.querySelector('button');
+                    const originalText = button.innerHTML;
+
+                    // Disable button temporarily
+                    button.disabled = true;
+
+                    fetch('/cart/add', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast(data.message, 'success');
+                                // Update cart count
+                                const cartCounts = document.querySelectorAll('.cart-count');
+                                cartCounts.forEach(el => el.textContent = data.cartSize);
+                            } else {
+                                showToast(data.message || 'Error al agregar', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('Error de conexión', 'error');
+                        })
+                        .finally(() => {
+                            button.disabled = false;
+                        });
+                });
+            });
+        });
+
+        function showToast(message, type) {
+            const toast = document.getElementById("toast");
+            const toastMsg = document.getElementById("toast-message");
+
+            toastMsg.textContent = message;
+            toast.className = "toast show " + type;
+
+            setTimeout(function () {
+                toast.className = toast.className.replace("show", "");
+            }, 3000);
+        }
+    </script>
 </body>
 
 </html>

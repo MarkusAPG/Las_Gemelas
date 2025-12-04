@@ -42,9 +42,12 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public String addToCart(@RequestParam Long productId, @RequestParam String type, HttpSession session) {
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<java.util.Map<String, Object>> addToCart(
+            @RequestParam Long productId, @RequestParam String type, HttpSession session) {
         List<CartItem> cart = getCart(session);
         Optional<Producto> productOpt = productoRepository.findById(productId);
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
 
         if (productOpt.isPresent()) {
             Producto product = productOpt.get();
@@ -61,10 +64,18 @@ public class CartController {
                 cart.add(new CartItem(product, 1, type));
             }
             session.setAttribute("cart", cart); // Explicitly save cart
-            session.setAttribute("cartSize", cart.stream().mapToInt(CartItem::getCantidad).sum());
+            int newSize = cart.stream().mapToInt(CartItem::getCantidad).sum();
+            session.setAttribute("cartSize", newSize);
+
+            response.put("success", true);
+            response.put("message", "Producto agregado al carrito (" + type + ")");
+            response.put("cartSize", newSize);
+            return org.springframework.http.ResponseEntity.ok(response);
         }
 
-        return "redirect:/";
+        response.put("success", false);
+        response.put("message", "Producto no encontrado");
+        return org.springframework.http.ResponseEntity.badRequest().body(response);
     }
 
     @GetMapping("/remove/{index}")

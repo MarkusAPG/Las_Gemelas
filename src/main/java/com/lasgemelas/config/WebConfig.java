@@ -9,9 +9,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Map /img/** to the uploads directory
-        // Using file:/// prefix for absolute file system path
-        registry.addResourceHandler("/img/**")
+        // Map /product-images/** to the uploads directory
+        registry.addResourceHandler("/product-images/**")
                 .addResourceLocations("file:///C:/Users/vasqu/OneDrive/Desktop/Las Gemelas/uploads/");
     }
 }

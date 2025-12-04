@@ -37,9 +37,21 @@ public class ReportService {
         return compraRepository.findByFechaBetween(start, end);
     }
 
+    public List<Compra> getSalesByDateRange(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(LocalTime.MAX);
+        return compraRepository.findByFechaBetween(start, end);
+    }
+
     public List<Alquiler> getDailyRentals(LocalDate date) {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.atTime(LocalTime.MAX);
+        return alquilerRepository.findByFechaRegistroBetween(start, end);
+    }
+
+    public List<Alquiler> getRentalsByDateRange(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(LocalTime.MAX);
         return alquilerRepository.findByFechaRegistroBetween(start, end);
     }
 
@@ -49,9 +61,9 @@ public class ReportService {
     }
 
     // 3. Indicators
-    public Map<String, Object> getIndicators(LocalDate date) {
-        List<Compra> sales = getDailySales(date);
-        List<Alquiler> rentals = getDailyRentals(date);
+    public Map<String, Object> getIndicators(LocalDate startDate, LocalDate endDate) {
+        List<Compra> sales = getSalesByDateRange(startDate, endDate);
+        List<Alquiler> rentals = getRentalsByDateRange(startDate, endDate);
 
         BigDecimal totalSales = sales.stream()
                 .map(c -> c.getTotal() != null ? c.getTotal() : BigDecimal.ZERO)
@@ -71,38 +83,41 @@ public class ReportService {
     }
 
     // 4. Statistics (Max, Min, Avg)
-    public Map<String, Object> getStatistics(LocalDate date) {
-        List<Compra> sales = getDailySales(date);
+    public Map<String, Object> getStatistics(LocalDate startDate, LocalDate endDate) {
+        List<Compra> sales = getSalesByDateRange(startDate, endDate);
+        List<Alquiler> rentals = getRentalsByDateRange(startDate, endDate);
+
         Map<String, Object> stats = new HashMap<>();
 
-        if (sales.isEmpty()) {
-            stats.put("maxSale", BigDecimal.ZERO);
-            stats.put("minSale", BigDecimal.ZERO);
-            stats.put("avgSale", BigDecimal.ZERO);
-            return stats;
-        }
+        // Sales Stats
+        stats.put("sales", calculateStats(
+                sales.stream().map(c -> c.getTotal() != null ? c.getTotal() : BigDecimal.ZERO).toList()));
 
-        BigDecimal maxSale = sales.stream()
-                .map(c -> c.getTotal() != null ? c.getTotal() : BigDecimal.ZERO)
-                .max(BigDecimal::compareTo)
-                .orElse(BigDecimal.ZERO);
-
-        BigDecimal minSale = sales.stream()
-                .map(c -> c.getTotal() != null ? c.getTotal() : BigDecimal.ZERO)
-                .min(BigDecimal::compareTo)
-                .orElse(BigDecimal.ZERO);
-
-        BigDecimal totalSales = sales.stream()
-                .map(c -> c.getTotal() != null ? c.getTotal() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal avgSale = totalSales.divide(BigDecimal.valueOf(sales.size()), 2, RoundingMode.HALF_UP);
-
-        stats.put("maxSale", maxSale);
-        stats.put("minSale", minSale);
-        stats.put("avgSale", avgSale);
+        // Rental Stats
+        stats.put("rentals", calculateStats(
+                rentals.stream().map(a -> a.getTotal() != null ? a.getTotal() : BigDecimal.ZERO).toList()));
 
         return stats;
+    }
+
+    private Map<String, BigDecimal> calculateStats(List<BigDecimal> amounts) {
+        Map<String, BigDecimal> result = new HashMap<>();
+        if (amounts.isEmpty()) {
+            result.put("max", BigDecimal.ZERO);
+            result.put("min", BigDecimal.ZERO);
+            result.put("avg", BigDecimal.ZERO);
+            return result;
+        }
+
+        BigDecimal max = amounts.stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        BigDecimal min = amounts.stream().min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        BigDecimal total = amounts.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal avg = total.divide(BigDecimal.valueOf(amounts.size()), 2, RoundingMode.HALF_UP);
+
+        result.put("max", max);
+        result.put("min", min);
+        result.put("avg", avg);
+        return result;
     }
 
     // 5. Deleted Records
@@ -111,11 +126,11 @@ public class ReportService {
     }
 
     // 6. Financials (Income, Utility, Stock Value)
-    public Map<String, Object> getFinancials(LocalDate date) {
+    public Map<String, Object> getFinancials(LocalDate startDate, LocalDate endDate) {
         Map<String, Object> financials = new HashMap<>();
 
-        // Income for the day
-        Map<String, Object> indicators = getIndicators(date);
+        // Income for the range
+        Map<String, Object> indicators = getIndicators(startDate, endDate);
         BigDecimal totalIncome = ((BigDecimal) indicators.get("totalSalesAmount"))
                 .add((BigDecimal) indicators.get("totalRentalsAmount"));
 

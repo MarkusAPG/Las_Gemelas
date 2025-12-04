@@ -25,18 +25,40 @@ public class AuthController {
     @PostMapping("/login")
     public String loginProcess(@RequestParam String correo, @RequestParam String contrasena, HttpSession session,
             Model model) {
-        Usuario usuario = usuarioRepository.findByCorreoAndContrasena(correo, contrasena);
-        if (usuario != null) {
+        try {
+            System.out.println("Attempting login for: " + correo);
+
+            // 1. Find by email only first
+            Usuario usuario = usuarioRepository.findByCorreo(correo);
+
+            if (usuario == null) {
+                System.out.println("User not found: " + correo);
+                model.addAttribute("error", "Usuario no encontrado.");
+                return "login";
+            }
+
+            // 2. Check password
+            if (!usuario.getContrasena().equals(contrasena)) {
+                System.out.println("Password mismatch for: " + correo);
+                model.addAttribute("error", "Contraseña incorrecta.");
+                return "login";
+            }
+
+            // 3. Login success
+            System.out.println("User found and authenticated: " + usuario.getNombre() + ", Role: " + usuario.getRol());
             session.setAttribute("usuario", usuario);
+
             if ("admin".equals(usuario.getRol())) {
-                return "redirect:/admin";
+                System.out.println("Redirecting to /admin/dashboard");
+                return "redirect:/admin/dashboard";
             }
             if ("tecnico".equals(usuario.getRol())) {
                 return "redirect:/tecnico";
             }
             return "redirect:/";
-        } else {
-            model.addAttribute("error", "Credenciales inválidas");
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Error interno: " + e.getMessage());
             return "login";
         }
     }
